@@ -7,12 +7,14 @@
 define([
     'widgets/EasyDAG/EasyDAGWidget',
     './lib/elk.bundled',
+    './SelectionManager',
     'underscore',
     'text!./styles/SemanticGraphWidget.css',  // example loading text w/ requirejs
     'css!./styles/SemanticGraphWidget.css'
 ], function (
     EasyDAGWidget,
     ELK,
+    SelectionManager,
     _,
     cssText
 ) {
@@ -27,6 +29,7 @@ define([
 
     SemanticGraphWidget.prototype = Object.create(EasyDAGWidget.prototype);
 
+    SemanticGraphWidget.prototype.SelectionManager = SelectionManager;
     SemanticGraphWidget.prototype.refreshScreen = function () {
         if (!this.active) {
             return;

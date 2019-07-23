@@ -22,6 +22,7 @@
     "webgme": "^2.23.0"
   },
   "dependencies": {
+    "elkjs": "^0.4.1",
     "webgme-easydag": "^1.3.0"
   }
 }
