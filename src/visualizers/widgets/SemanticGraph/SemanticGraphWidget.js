@@ -52,16 +52,10 @@ define([
     SemanticGraphWidget.prototype.addNode = function (desc) {
         if (desc) {
             // Add node to a table of nodes
-            var node = document.createElement('div'),
-                label = 'children';
-
-            if (desc.childrenIds.length === 1) {
-                label = 'child';
-            }
+            var node = document.createElement('div');
 
             this.nodes[desc.id] = desc;
-            node.innerHTML = 'Adding node "' + desc.name + '" (click to view). It has ' +
-                desc.childrenIds.length + ' ' + label + '.';
+            node.innerHTML = 'Adding node "' + desc.name + '" (click to view).';
 
             this._el.append(node);
             node.onclick = this.onNodeClick.bind(this, desc.id);
