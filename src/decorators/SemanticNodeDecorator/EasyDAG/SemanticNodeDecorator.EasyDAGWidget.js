@@ -28,5 +28,7 @@ define([
         return this._node.attributes.name.value;
     };
 
+    SemanticNodeDecorator.prototype.expand =  SemanticNodeDecorator.prototype.condense;
+
     return SemanticNodeDecorator;
 });
