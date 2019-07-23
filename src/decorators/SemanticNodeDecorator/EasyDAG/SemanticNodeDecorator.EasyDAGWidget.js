@@ -16,11 +16,15 @@ define([
     SemanticNodeDecorator.prototype = Object.create(EllipseDecorator.prototype);
 
     SemanticNodeDecorator.prototype.getDisplayName = function() {
-        // TODO: Access the attributes via `this._node`. For example,
-        // the value of the name attribute can be retrieved using:
-        //
-        //       this._node.attributes.name.value
-        //
+        if (this._node.attributes.hasOwnProperty("display_name")) {
+            var display_name = this._node.attributes.display_name.value;
+            if (display_name) {
+                return display_name;
+            }
+        }
+        if (this._node.attributes.name.value.length > 20) {
+            return this._node.attributes.name.value.slice(0, 20) + "...";
+        }
         return this._node.attributes.name.value;
     };
 
