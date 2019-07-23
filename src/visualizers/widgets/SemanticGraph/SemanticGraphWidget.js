@@ -83,7 +83,7 @@ define([
     };
 
     SemanticGraphWidget.prototype.onBackgroundDblClick = function () {
-        this._el.append('<div>Background was double-clicked!!</div>');
+        this._el.append(`<div>Edge types: ${this.getEdgeTypes().join(', ')}</div>`);
     };
 
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */

@@ -44,7 +44,13 @@ define([
         };
 
         this._widget.getEdgeTypes = () => {
-            // TODO
+            const metanodes = this._client.getAllMetaNodes();
+            const edge = metanodes.find(node => node.getAttribute('name') === 'Edge');
+
+            // TODO: Should we include "Edge"
+            return metanodes
+                .filter(node => node.isTypeOf(edge.getId()) && node !== edge)
+                .map(node => node.getAttribute('name'));
         };
 
         this._widget.getValidConnectionTypes = (srcId, dstId) => {
@@ -64,7 +70,7 @@ define([
         };
 
         this._widget.createEdgeType = dict => {
-            // TODO
+            // TODO: Define a new meta node that inherits from 'Edge' or some specified base
         };
     };
 
