@@ -7,6 +7,13 @@
         "panel": "src/visualizers/panels/SemanticGraph",
         "secondary": false,
         "widget": "src/visualizers/widgets/SemanticGraph"
+      },
+      "ActionButton": {
+        "src": "panels/ActionButton/ActionButtonPanel",
+        "title": "ActionButton",
+        "panel": "src/visualizers/panels/ActionButton",
+        "secondary": false,
+        "widget": "src/visualizers/widgets/ActionButton"
       }
     },
     "seeds": {
@@ -18,7 +25,8 @@
       "SemanticNodeDecorator": {
         "src": "src/decorators/SemanticNodeDecorator"
       }
-    }
+    },
+    "layouts": {}
   },
   "dependencies": {
     "visualizers": {
@@ -29,6 +37,22 @@
         "secondary": false,
         "widget": "src/visualizers/widgets/EasyDAG",
         "project": "webgme-easydag"
+      },
+      "FloatingActionButton": {
+        "src": "panels/FloatingActionButton/FloatingActionButtonPanel",
+        "title": "FloatingActionButton",
+        "panel": "src/visualizers/panels/FloatingActionButton",
+        "secondary": true,
+        "widget": "src/visualizers/widgets/FloatingActionButton",
+        "project": "webgme-fab"
+      },
+      "AutoViz": {
+        "src": "panels/AutoViz/AutoVizPanel",
+        "title": "AutoViz",
+        "panel": "src/visualizers/panels/AutoViz",
+        "secondary": false,
+        "widget": "src/visualizers/widgets/AutoViz",
+        "project": "webgme-autoviz"
       }
     },
     "seeds": {},
@@ -36,6 +60,13 @@
       "EllipseDecorator": {
         "project": "webgme-easydag",
         "path": "node_modules/webgme-easydag/src/decorators/EllipseDecorator"
+      }
+    },
+    "layouts": {
+      "CHFLayout": {
+        "project": "webgme-chflayout",
+        "path": "node_modules/webgme-chflayout/src/layouts/CHFLayout",
+        "enabled": true
       }
     }
   }

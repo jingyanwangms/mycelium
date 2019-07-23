@@ -23,6 +23,9 @@
   },
   "dependencies": {
     "elkjs": "^0.4.1",
-    "webgme-easydag": "^1.3.0"
+    "webgme-autoviz": "^2.2.2",
+    "webgme-chflayout": "^2.0.1",
+    "webgme-easydag": "^1.3.0",
+    "webgme-fab": "^2.1.1"
   }
 }
