@@ -38,7 +38,6 @@ define([
         // WRITE UPDATES
         // Update the locations of all the nodes
 
-        // TODO: Compute the layout then call the following function
         const nodes = Object.values(this.items)
             .map(item => _.pick(item, ['id', 'width', 'height']));
         const edges = Object.values(this.connections)
@@ -73,8 +72,14 @@ define([
 
         for (let i = graph.edges.length; i--;) {
             const id = graph.edges[i].id;
+            if (!graph.edges[i].sections && graph.edges[i].sources[0] === graph.edges[i].targets[0]) {
+                console.warn(`Unable to render edge ${id}. Self-connections not supported by current layout.`);
+                continue;
+            }
+
             this.connections[id].points = graph.edges[i].sections
                 .map(sec => sec.endPoint);
+
             this.connections[id].points.unshift(graph.edges[i].sections[0].startPoint);
             this.connections[id].redraw();
         }
