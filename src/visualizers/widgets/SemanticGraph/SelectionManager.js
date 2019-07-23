@@ -17,15 +17,19 @@ define([
     SelectionManager.prototype.createActionButtons = function(width, height) {
         ManagerBase.prototype.createActionButtons.call(this, width, height);
 
+        var btn;
+
         // Check that the base type
-        const btn = new Buttons.ShowMore({
-            $pEl: this.$selection,
-            context: this._widget,
-            title: 'View details',
-            item: this.selectedItem,
-            x: width,
-            y: 0
-        });
+        if (!this.selectedItem.isConnection) {
+            btn = new Buttons.ShowMore({
+                $pEl: this.$selection,
+                context: this._widget,
+                title: 'View details',
+                item: this.selectedItem,
+                x: width,
+                y: 0
+            });
+        }
 
         return btn;
     };
