@@ -30,6 +30,7 @@ define([
 
     SemanticGraphControl.prototype = Object.create(EasyDAGControl.prototype);
 
+    SemanticGraphControl.prototype.DEFAULT_DECORATOR = 'SemanticNodeDecorator';
     SemanticGraphControl.prototype._initWidgetEventHandlers = function () {
         EasyDAGControl.prototype._initWidgetEventHandlers.call(this);
 

@@ -14,7 +14,11 @@
         "src": "src/seeds/SemanticGraph"
       }
     },
-    "decorators": {}
+    "decorators": {
+      "SemanticNodeDecorator": {
+        "src": "src/decorators/SemanticNodeDecorator"
+      }
+    }
   },
   "dependencies": {
     "visualizers": {
