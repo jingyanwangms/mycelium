@@ -118,7 +118,6 @@ define([
         const node = this._client.getNode(nodeId);
 
         if (node) {
-            // TODO: Check if the gme node is a node, etc
             const desc = {
                 id: node.getId(),
                 name: node.getAttribute(nodePropertyNames.Attributes.name),
@@ -130,20 +129,32 @@ define([
             node.getAttributeNames()
                 .forEach(name => desc.attributes[name] = node.getAttribute(name));
 
-            // TODO: Check if the gme node is a node, etc
+            const isConnection = node.getPointerNames().includes('src') && 
+                node.getPointerNames().includes('dst');
+
+            if (isConnection) {
+                desc.srcId = node.getPointerId('src');
+                desc.dstId = node.getPointerId('dst');
+                desc.types = this.getBaseTypesUntil(node, 'Edge');
+            } else {
+                desc.types = this.getBaseTypesUntil(node, 'Node');
+            }
 
             return desc;
-            /*
-            const edge = {
-                id: node.getId(),
-                name: node.getAttribute(nodePropertyNames.Attributes.name),
-                types: ['Paper'],  // path to "Edge" in inheritance tree
-                parentId: node.getParentId(),
-                srcId: ,
-                dstId: ,
-            };
-            */
         }
+    };
+
+    SemanticGraphControl.prototype.getBaseTypesUntil = function (node, end='FCO') {
+        const types = [];
+
+        while (node && node.getAttribute('name') !== end) {
+            node = this._client.getNode(node.getBaseId());
+            if (node && node.isMetaNode()) {
+                types.push(node.getAttribute('name'));
+            }
+        }
+
+        return types;
     };
 
     /* * * * * * * * Node Event Handling * * * * * * * */
