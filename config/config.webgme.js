@@ -7,6 +7,7 @@ var config = require('webgme/config/config.default'),
     validateConfig = require('webgme/config/validator');
 
 // The paths can be loaded from the webgme-setup.json
+config.seedProjects.basePaths.push(__dirname + '/../src/seeds/SemanticGraph');
 
 
 
@@ -21,10 +22,10 @@ config.visualization.visualizerDescriptors.push(__dirname + '/../src/visualizers
 config.requirejsPaths = {
   'panels': './src/visualizers/panels',
   'widgets': './src/visualizers/widgets',
-  'sag': './src/common'
+  'mycelium': './src/common'
 };
 
 
-config.mongo.uri = 'mongodb://127.0.0.1:27017/sag';
+config.mongo.uri = 'mongodb://127.0.0.1:27017/mycelium';
 validateConfig(config);
 module.exports = config;

@@ -8,9 +8,15 @@
         "secondary": false,
         "widget": "src/visualizers/widgets/SemanticGraph"
       }
+    },
+    "seeds": {
+      "SemanticGraph": {
+        "src": "src/seeds/SemanticGraph"
+      }
     }
   },
   "dependencies": {
-    "visualizers": {}
+    "visualizers": {},
+    "seeds": {}
   }
 }
