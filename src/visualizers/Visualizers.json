@@ -10,5 +10,17 @@
     "title": "EasyDAG",
     "panel": "panels/EasyDAG/EasyDAGPanel",
     "DEBUG_ONLY": false
+  },
+  {
+    "id": "AutoViz",
+    "title": "AutoViz",
+    "panel": "panels/AutoViz/AutoVizPanel",
+    "DEBUG_ONLY": false
+  },
+  {
+    "id": "ActionButton",
+    "title": "ActionButton",
+    "panel": "panels/ActionButton/ActionButtonPanel",
+    "DEBUG_ONLY": false
   }
 ]
