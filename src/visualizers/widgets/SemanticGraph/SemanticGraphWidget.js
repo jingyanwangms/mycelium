@@ -6,14 +6,19 @@
 
 define([
     'widgets/EasyDAG/EasyDAGWidget',
+    './lib/elk.bundled',
+    'underscore',
     'text!./styles/SemanticGraphWidget.css',  // example loading text w/ requirejs
     'css!./styles/SemanticGraphWidget.css'
 ], function (
     EasyDAGWidget,
+    ELK,
+    _,
     cssText
 ) {
     'use strict';
 
+    const elk = new ELK()
     var WIDGET_CLASS = 'semantic-graph';
 
     function SemanticGraphWidget(logger, container) {
@@ -22,7 +27,6 @@ define([
 
     SemanticGraphWidget.prototype = Object.create(EasyDAGWidget.prototype);
 
-    /*
     SemanticGraphWidget.prototype.refreshScreen = function () {
         if (!this.active) {
             return;
@@ -32,39 +36,57 @@ define([
         // Update the locations of all the nodes
 
         // TODO: Compute the layout then call the following function
-        this.queueFns([
-            this.updateTranslation.bind(this),
-            this.refreshItems.bind(this),
-            this.refreshConnections.bind(this),
-            this.selectionManager.redraw.bind(this.selectionManager),
-            this.updateContainerWidth.bind(this),
-            this.refreshExtras.bind(this)
-        ]);
+        const nodes = Object.values(this.items)
+            .map(item => _.pick(item, ['id', 'width', 'height']));
+        const edges = Object.values(this.connections)
+            .map(conn => ({id: conn.id, sources: [conn.src], targets: [conn.dst]}));
+
+        const graph = {
+            id: "root",
+            layoutOptions: {
+                'elk.algorithm': 'mrtree',
+                'elk.spacing.nodeNode': 50,
+            },
+            children: nodes,
+            edges: edges
+        };
+
+        return elk.layout(graph)
+            .then(graph => {
+                this.queueFns([
+                    this.updateTranslation.bind(this),
+                    this.refreshItems.bind(this, graph),
+                    this.refreshConnections.bind(this, graph),
+                    this.selectionManager.redraw.bind(this.selectionManager),
+                    this.updateContainerWidth.bind(this),
+                    this.refreshExtras.bind(this)
+                ]);
+            });
     };
 
-    SemanticGraphWidget.prototype.refreshConnections = function () {
+    SemanticGraphWidget.prototype.refreshConnections = function (graph) {
         const connIds = Object.keys(this.connections);
         this._logger.debug(`Refreshing ${connIds.length} connections`);
-        for (let i = connIds.length; i--;) {
-            // TODO: set the points
-            //this.connections[connIds[i]].points = [];
-            this.connections[connIds[i]].redraw();
+
+        for (let i = graph.edges.length; i--;) {
+            const id = graph.edges[i].id;
+            this.connections[id].points = graph.edges[i].sections
+                .map(sec => sec.endPoint);
+            this.connections[id].points.unshift(graph.edges[i].sections[0].startPoint);
+            this.connections[id].redraw();
         }
     };
 
-    SemanticGraphWidget.prototype.refreshItems = function () {
-        // Redraw items
-        const nodeIds = Object.keys(this.items);
-        this._logger.info(`Redrawing ${nodeIds.length} nodes`);
-        for (let i = nodeIds.length; i--;) {
-            // TODO: Set the x, y value for the item
-            //this.items[nodeIds[i]].x = ;
-            //this.items[nodeIds[i]].y = ;
-            this.items[nodeIds[i]].redraw(this._zoomValue);
+    SemanticGraphWidget.prototype.refreshItems = function (graph) {
+        this._logger.info(`Redrawing ${graph.children.length} nodes`);
+        for (let i = graph.children.length; i--;) {
+            const id = graph.children[i].id;
+            const item = this.items[id];
+            item.x = graph.children[i].x + item.width/2;
+            item.y = graph.children[i].y + item.height/2;
+            item.redraw(this._zoomValue);
         }
-
     };
-    */
 
     return SemanticGraphWidget;
 });
