@@ -1,0 +1,8 @@
+[
+  {
+    "id": "SemanticGraph",
+    "title": "SemanticGraph",
+    "panel": "panels/SemanticGraph/SemanticGraphPanel",
+    "DEBUG_ONLY": false
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "components": {
+    "visualizers": {
+      "SemanticGraph": {
+        "src": "panels/SemanticGraph/SemanticGraphPanel",
+        "title": "SemanticGraph",
+        "panel": "src/visualizers/panels/SemanticGraph",
+        "secondary": false,
+        "widget": "src/visualizers/widgets/SemanticGraph"
+      }
+    }
+  },
+  "dependencies": {
+    "visualizers": {}
+  }
+}
