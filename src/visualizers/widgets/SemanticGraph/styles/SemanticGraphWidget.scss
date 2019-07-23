@@ -4,4 +4,13 @@
 
 .semantic-graph {
   outline: none;
+}  
+.node-modal {
+  .modal-body {
+    font-size: 14px;
+  }
+  .close {
+    font-size: 30px; 
+    line-height: 0.5;
+  }
 }
