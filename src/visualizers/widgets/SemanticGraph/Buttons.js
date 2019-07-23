@@ -3,9 +3,11 @@
 define([
     'widgets/EasyDAG/Buttons',
     'webgme-easydag/Icons',
+    'text!./templates/node_modal.html.ejs',
 ], function(
     Buttons,
     Icons,
+    nodeModalTemplate,
 ) {
     // TODO: Make a "show more" button
 
@@ -38,9 +40,10 @@ define([
     };
 
     ShowMore.prototype._onClick = function(item) {
-        // TODO: Show the modal with the details about the item
-        console.log(item);
-        console.log('item data is', item.desc);
+        // TODO: display things like, authors, conference, etc. 
+        // once they are added to item.desc
+        var nodeModal = _.template(nodeModalTemplate)({node: item.desc});
+        $(nodeModal).modal("show");
     };
 
     return {

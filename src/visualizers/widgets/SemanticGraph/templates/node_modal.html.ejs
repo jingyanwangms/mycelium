@@ -1,0 +1,21 @@
+<div class="modal fade node-modal" id="node-internals-<%- node.id %>" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="close" data-dismiss="modal">
+                <span>&times;</span>
+                </button>
+            </div> -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                <span>&times;</span>
+                </button>
+                <h4 class="modal-title" id="modalLabelSmall"><%- node.attributes.name.value %></h4>
+            </div>
+            <div class="modal-body">
+                <%- node.attributes.description.value %>
+            </div>
+        </div>
+    </div>
+</div>
