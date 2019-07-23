@@ -4,13 +4,9 @@
  */
 
 define([
-    'js/Constants',
-    'js/Utils/GMEConcepts',
-    'js/NodePropertyNames'
+    'panels/EasyDAG/EasyDAGControl',
 ], function (
-    CONSTANTS,
-    GMEConcepts,
-    nodePropertyNames
+    EasyDAGControl
 ) {
 
     'use strict';
@@ -32,11 +28,10 @@ define([
         this._logger.debug('ctor finished');
     }
 
+    SemanticGraphControl.prototype = Object.create(EasyDAGControl.prototype);
+
     SemanticGraphControl.prototype._initWidgetEventHandlers = function () {
-        this._widget.onNodeClick = function (id) {
-            // Change the current active object
-            WebGMEGlobal.State.registerActiveObject(id);
-        };
+        EasyDAGControl.prototype._initWidgetEventHandlers.call(this);
 
         this._widget.getAllAuthors = () => {
             // TODO: Get the authors using the client
@@ -54,7 +49,7 @@ define([
         };
 
         this._widget.getValidConnectionTypes = (srcId, dstId) => {
-            // TODO
+            // TODO: Get all valid edges btwn the given nodes
         };
 
         this._widget.createNode = dict => {
@@ -121,20 +116,10 @@ define([
 
     // This next function retrieves the relevant node information for the widget
     SemanticGraphControl.prototype._getObjectDescriptor = function (nodeId) {
+        const desc = EasyDAGControl.prototype._getObjectDescriptor.call(this, nodeId);
         const node = this._client.getNode(nodeId);
 
         if (node) {
-            const desc = {
-                id: node.getId(),
-                name: node.getAttribute(nodePropertyNames.Attributes.name),
-                attributes: {},
-                //type: 'Paper',
-                parentId: node.getParentId(),
-            };
-
-            node.getAttributeNames()
-                .forEach(name => desc.attributes[name] = node.getAttribute(name));
-
             const isConnection = node.getPointerNames().includes('src') && 
                 node.getPointerNames().includes('dst');
 
@@ -145,9 +130,9 @@ define([
             } else {
                 desc.types = this.getBaseTypesUntil(node, 'Node');
             }
-
-            return desc;
         }
+
+        return desc;
     };
 
     SemanticGraphControl.prototype.getBaseTypesUntil = function (node, end='FCO') {
@@ -161,148 +146,6 @@ define([
         }
 
         return types;
-    };
-
-    /* * * * * * * * Node Event Handling * * * * * * * */
-    SemanticGraphControl.prototype._eventCallback = function (events) {
-        var i = events ? events.length : 0,
-            event;
-
-        this._logger.debug('_eventCallback \'' + i + '\' items');
-
-        while (i--) {
-            event = events[i];
-            switch (event.etype) {
-
-            case CONSTANTS.TERRITORY_EVENT_LOAD:
-                this._onLoad(event.eid);
-                break;
-            case CONSTANTS.TERRITORY_EVENT_UPDATE:
-                this._onUpdate(event.eid);
-                break;
-            case CONSTANTS.TERRITORY_EVENT_UNLOAD:
-                this._onUnload(event.eid);
-                break;
-            default:
-                break;
-            }
-        }
-
-        this._logger.debug('_eventCallback \'' + events.length + '\' items - DONE');
-    };
-
-    SemanticGraphControl.prototype._onLoad = function (gmeId) {
-        var description = this._getObjectDescriptor(gmeId);
-        this._widget.addNode(description);
-    };
-
-    SemanticGraphControl.prototype._onUpdate = function (gmeId) {
-        var description = this._getObjectDescriptor(gmeId);
-        this._widget.updateNode(description);
-    };
-
-    SemanticGraphControl.prototype._onUnload = function (gmeId) {
-        this._widget.removeNode(gmeId);
-    };
-
-    SemanticGraphControl.prototype._stateActiveObjectChanged = function (model, activeObjectId) {
-        if (this._currentNodeId === activeObjectId) {
-            // The same node selected as before - do not trigger
-        } else {
-            this.selectedObjectChanged(activeObjectId);
-        }
-    };
-
-    /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
-    SemanticGraphControl.prototype.destroy = function () {
-        this._detachClientEventListeners();
-        this._removeToolbarItems();
-    };
-
-    SemanticGraphControl.prototype._attachClientEventListeners = function () {
-        this._detachClientEventListeners();
-        WebGMEGlobal.State.on('change:' + CONSTANTS.STATE_ACTIVE_OBJECT, this._stateActiveObjectChanged, this);
-    };
-
-    SemanticGraphControl.prototype._detachClientEventListeners = function () {
-        WebGMEGlobal.State.off('change:' + CONSTANTS.STATE_ACTIVE_OBJECT, this._stateActiveObjectChanged);
-    };
-
-    SemanticGraphControl.prototype.onActivate = function () {
-        this._attachClientEventListeners();
-        this._displayToolbarItems();
-
-        if (typeof this._currentNodeId === 'string') {
-            WebGMEGlobal.State.registerActiveObject(this._currentNodeId, {suppressVisualizerFromNode: true});
-        }
-    };
-
-    SemanticGraphControl.prototype.onDeactivate = function () {
-        this._detachClientEventListeners();
-        this._hideToolbarItems();
-    };
-
-    /* * * * * * * * * * Updating the toolbar * * * * * * * * * */
-    SemanticGraphControl.prototype._displayToolbarItems = function () {
-
-        if (this._toolbarInitialized === true) {
-            for (var i = this._toolbarItems.length; i--;) {
-                this._toolbarItems[i].show();
-            }
-        } else {
-            this._initializeToolbar();
-        }
-    };
-
-    SemanticGraphControl.prototype._hideToolbarItems = function () {
-
-        if (this._toolbarInitialized === true) {
-            for (var i = this._toolbarItems.length; i--;) {
-                this._toolbarItems[i].hide();
-            }
-        }
-    };
-
-    SemanticGraphControl.prototype._removeToolbarItems = function () {
-
-        if (this._toolbarInitialized === true) {
-            for (var i = this._toolbarItems.length; i--;) {
-                this._toolbarItems[i].destroy();
-            }
-        }
-    };
-
-    SemanticGraphControl.prototype._initializeToolbar = function () {
-        var self = this,
-            toolBar = WebGMEGlobal.Toolbar;
-
-        this._toolbarItems = [];
-
-        this._toolbarItems.push(toolBar.addSeparator());
-
-        /************** Go to hierarchical parent button ****************/
-        this.$btnModelHierarchyUp = toolBar.addButton({
-            title: 'Go to parent',
-            icon: 'glyphicon glyphicon-circle-arrow-up',
-            clickFn: function (/*data*/) {
-                WebGMEGlobal.State.registerActiveObject(self._currentNodeParentId);
-            }
-        });
-        this._toolbarItems.push(this.$btnModelHierarchyUp);
-        this.$btnModelHierarchyUp.hide();
-
-        /************** Checkbox example *******************/
-
-        this.$cbShowConnection = toolBar.addCheckBox({
-            title: 'toggle checkbox',
-            icon: 'gme icon-gme_diagonal-arrow',
-            checkChangedFn: function (data, checked) {
-                self._logger.debug('Checkbox has been clicked!');
-            }
-        });
-        this._toolbarItems.push(this.$cbShowConnection);
-
-        this._toolbarInitialized = true;
     };
 
     return SemanticGraphControl;

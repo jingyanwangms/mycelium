@@ -5,9 +5,11 @@
  */
 
 define([
+    'widgets/EasyDAG/EasyDAGWidget',
     'text!./styles/SemanticGraphWidget.css',  // example loading text w/ requirejs
     'css!./styles/SemanticGraphWidget.css'
 ], function (
+    EasyDAGWidget,
     cssText
 ) {
     'use strict';
@@ -15,91 +17,54 @@ define([
     var WIDGET_CLASS = 'semantic-graph';
 
     function SemanticGraphWidget(logger, container) {
-        this._logger = logger.fork('Widget');
-
-        this._el = container;
-
-        this.nodes = {};
-        this._initialize();
-
-        this._logger.debug('ctor finished');
+        EasyDAGWidget.apply(this, arguments);
     }
 
-    SemanticGraphWidget.prototype._initialize = function () {
-        var width = this._el.width(),
-            height = this._el.height(),
-            self = this;
+    SemanticGraphWidget.prototype = Object.create(EasyDAGWidget.prototype);
 
-        // set widget class
-        this._el.addClass(WIDGET_CLASS);
+    /*
+    SemanticGraphWidget.prototype.refreshScreen = function () {
+        if (!this.active) {
+            return;
+        }
 
-        // Create a dummy header
-        this._el.append('<h3>SemanticGraph Events:</h3>');
+        // WRITE UPDATES
+        // Update the locations of all the nodes
 
-        // Registering to events can be done with jQuery (as normal)
-        this._el.on('dblclick', function (event) {
-            event.stopPropagation();
-            event.preventDefault();
-            self.onBackgroundDblClick();
-        });
+        // TODO: Compute the layout then call the following function
+        this.queueFns([
+            this.updateTranslation.bind(this),
+            this.refreshItems.bind(this),
+            this.refreshConnections.bind(this),
+            this.selectionManager.redraw.bind(this.selectionManager),
+            this.updateContainerWidth.bind(this),
+            this.refreshExtras.bind(this)
+        ]);
     };
 
-    SemanticGraphWidget.prototype.onWidgetContainerResize = function (width, height) {
-        this._logger.debug('Widget is resizing...');
-    };
-
-    // Adding/Removing/Updating items
-    SemanticGraphWidget.prototype.addNode = function (desc) {
-        if (desc) {
-            // Add node to a table of nodes
-            var node = document.createElement('div');
-
-            this.nodes[desc.id] = desc;
-            node.innerHTML = 'Adding node "' + desc.name + '" (click to view).';
-
-            this._el.append(node);
-            node.onclick = this.onNodeClick.bind(this, desc.id);
+    SemanticGraphWidget.prototype.refreshConnections = function () {
+        const connIds = Object.keys(this.connections);
+        this._logger.debug(`Refreshing ${connIds.length} connections`);
+        for (let i = connIds.length; i--;) {
+            // TODO: set the points
+            //this.connections[connIds[i]].points = [];
+            this.connections[connIds[i]].redraw();
         }
     };
 
-    SemanticGraphWidget.prototype.removeNode = function (gmeId) {
-        var desc = this.nodes[gmeId];
-        this._el.append('<div>Removing node "' + desc.name + '"</div>');
-        delete this.nodes[gmeId];
-    };
-
-    SemanticGraphWidget.prototype.updateNode = function (desc) {
-        if (desc) {
-            this._logger.debug('Updating node:', desc);
-            this._el.append('<div>Updating node "' + desc.name + '"</div>');
+    SemanticGraphWidget.prototype.refreshItems = function () {
+        // Redraw items
+        const nodeIds = Object.keys(this.items);
+        this._logger.info(`Redrawing ${nodeIds.length} nodes`);
+        for (let i = nodeIds.length; i--;) {
+            // TODO: Set the x, y value for the item
+            //this.items[nodeIds[i]].x = ;
+            //this.items[nodeIds[i]].y = ;
+            this.items[nodeIds[i]].redraw(this._zoomValue);
         }
-    };
 
-    /* * * * * * * * Visualizer event handlers * * * * * * * */
-
-    SemanticGraphWidget.prototype.onNodeClick = function (/*id*/) {
-        // This currently changes the active node to the given id and
-        // this is overridden in the controller.
     };
-
-    SemanticGraphWidget.prototype.onBackgroundDblClick = function () {
-        this._el.append(`<div>Edge types: ${this.getEdgeTypes().join(', ')}</div>`);
-    };
-
-    /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
-    SemanticGraphWidget.prototype.destroy = function () {
-    };
-
-    SemanticGraphWidget.prototype.onActivate = function () {
-        this._logger.debug('SemanticGraphWidget has been activated');
-    };
-
-    SemanticGraphWidget.prototype.onDeactivate = function () {
-        this._logger.debug('SemanticGraphWidget has been deactivated');
-    };
-
-    SemanticGraphWidget.prototype.getAuthors = function (desc) {
-    };
+    */
 
     return SemanticGraphWidget;
 });
