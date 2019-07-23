@@ -116,19 +116,32 @@ define([
     // This next function retrieves the relevant node information for the widget
     SemanticGraphControl.prototype._getObjectDescriptor = function (nodeId) {
         var node = this._client.getNode(nodeId),
-            objDescriptor;
+            desc;
+
         if (node) {
-            objDescriptor = {
+            /*
+            desc = {
                 id: node.getId(),
                 name: node.getAttribute(nodePropertyNames.Attributes.name),
-                childrenIds: node.getChildrenIds(),
+                attributes: {
+                    description: 'Description and other attributes for the node',
+                },
+                type: 'Paper',
                 parentId: node.getParentId(),
-                isConnection: GMEConcepts.isConnection(nodeId)
-                // TODO: Edges
             };
+
+            const edge = {
+                id: node.getId(),
+                name: node.getAttribute(nodePropertyNames.Attributes.name),
+                types: ['Paper'],  // path to "Edge" in inheritance tree
+                parentId: node.getParentId(),
+                srcId: ,
+                dstId: ,
+            };
+            */
         }
 
-        return objDescriptor;
+        return desc;
     };
 
     /* * * * * * * * Node Event Handling * * * * * * * */
