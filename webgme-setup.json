@@ -13,10 +13,26 @@
       "SemanticGraph": {
         "src": "src/seeds/SemanticGraph"
       }
-    }
+    },
+    "decorators": {}
   },
   "dependencies": {
-    "visualizers": {},
-    "seeds": {}
+    "visualizers": {
+      "EasyDAG": {
+        "src": "panels/EasyDAG/EasyDAGPanel",
+        "title": "EasyDAG",
+        "panel": "src/visualizers/panels/EasyDAG",
+        "secondary": false,
+        "widget": "src/visualizers/widgets/EasyDAG",
+        "project": "webgme-easydag"
+      }
+    },
+    "seeds": {},
+    "decorators": {
+      "EllipseDecorator": {
+        "project": "webgme-easydag",
+        "path": "node_modules/webgme-easydag/src/decorators/EllipseDecorator"
+      }
+    }
   }
 }

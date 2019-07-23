@@ -4,5 +4,11 @@
     "title": "SemanticGraph",
     "panel": "panels/SemanticGraph/SemanticGraphPanel",
     "DEBUG_ONLY": false
+  },
+  {
+    "id": "EasyDAG",
+    "title": "EasyDAG",
+    "panel": "panels/EasyDAG/EasyDAGPanel",
+    "DEBUG_ONLY": false
   }
 ]

@@ -7,10 +7,12 @@ var config = require('webgme/config/config.default'),
     validateConfig = require('webgme/config/validator');
 
 // The paths can be loaded from the webgme-setup.json
+config.visualization.decoratorPaths.push(__dirname + '/../node_modules/webgme-easydag/src/decorators');
 config.seedProjects.basePaths.push(__dirname + '/../src/seeds/SemanticGraph');
 
 
 
+config.visualization.panelPaths.push(__dirname + '/../node_modules/webgme-easydag/src/visualizers/panels');
 config.visualization.panelPaths.push(__dirname + '/../src/visualizers/panels');
 
 
@@ -20,8 +22,13 @@ config.visualization.panelPaths.push(__dirname + '/../src/visualizers/panels');
 config.visualization.visualizerDescriptors.push(__dirname + '/../src/visualizers/Visualizers.json');
 // Add requirejs paths
 config.requirejsPaths = {
+  'EllipseDecorator': 'node_modules/webgme-easydag/src/decorators/EllipseDecorator',
+  'EasyDAG': 'panels/EasyDAG/EasyDAGPanel',
   'panels': './src/visualizers/panels',
   'widgets': './src/visualizers/widgets',
+  'panels/EasyDAG': './node_modules/webgme-easydag/src/visualizers/panels/EasyDAG',
+  'widgets/EasyDAG': './node_modules/webgme-easydag/src/visualizers/widgets/EasyDAG',
+  'webgme-easydag': './node_modules/webgme-easydag/src/common',
   'mycelium': './src/common'
 };
 
