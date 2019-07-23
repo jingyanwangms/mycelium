@@ -5,7 +5,7 @@
  */
 
 define([
-    'text!./styles/SemanticGraphWidget.css'
+    'text!./styles/SemanticGraphWidget.css',  // example loading text w/ requirejs
     'css!./styles/SemanticGraphWidget.css'
 ], function (
     cssText
