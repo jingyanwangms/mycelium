@@ -66,6 +66,10 @@ define([
             });
     };
 
+    SemanticGraphWidget.prototype.refreshExtras = function () {
+        this.updateEmptyMsg();
+    };
+
     SemanticGraphWidget.prototype.refreshConnections = function (graph) {
         const connIds = Object.keys(this.connections);
         this._logger.debug(`Refreshing ${connIds.length} connections`);
