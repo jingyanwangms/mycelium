@@ -14,3 +14,10 @@
     line-height: 0.5;
   }
 }
+
+#edge-prompt {
+  overflow: visible;
+  .modal-body {
+    overflow: visible;
+  }
+}

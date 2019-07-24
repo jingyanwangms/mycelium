@@ -10,3 +10,8 @@
 .node-modal .close {
   font-size: 30px;
   line-height: 0.5; }
+
+#edge-prompt {
+  overflow: visible; }
+  #edge-prompt .modal-body {
+    overflow: visible; }

@@ -125,7 +125,6 @@ define([
                 });
                 edgePromptDOM.find("#select-button").click(() => {
                     var selected_name = $(".selected-label").text();
-                    console.log(selected_name);
                     var conn_id = conns.find(x => x.name === selected_name).id;
                     // TODO: this does not create the connection!
                     this.connectNodes(srcId, dstId, conn_id);
