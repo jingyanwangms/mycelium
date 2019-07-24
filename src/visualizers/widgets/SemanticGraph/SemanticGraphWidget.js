@@ -141,11 +141,13 @@ define([
                         return;
                     }
                     var newConnId = this.createConnectionType(new_conn_name, selected_name);
-                    this.connectNodes(srcId, dstId, newConnId);
-                    edgePromptDOM.on('hidden.bs.modal', function (e) {
-                        edgePromptDOM.remove();
-                    });                
-                    edgePromptDOM.modal("hide");
+                    setTimeout(() => {
+                        this.connectNodes(srcId, dstId, newConnId);
+                        edgePromptDOM.on('hidden.bs.modal', function (e) {
+                            edgePromptDOM.remove();
+                        });                
+                        edgePromptDOM.modal("hide");
+                    }, 100);
                 });
                 edgePromptDOM.modal("show");
             },
