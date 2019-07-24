@@ -9,14 +9,19 @@ define([
     './lib/elk.bundled',
     './SelectionManager',
     'underscore',
-    'text!./styles/SemanticGraphWidget.css',  // example loading text w/ requirejs
-    'css!./styles/SemanticGraphWidget.css'
+    'text!./templates/edge_prompt.html.ejs',  // example loading text w/ requirejs
+    'css!./styles/SemanticGraphWidget.css',
+    'css!./styles/hierarchy-select.min.css',
+    './styles/hierarchy-select.min',
 ], function (
     EasyDAGWidget,
     ELK,
     SelectionManager,
     _,
-    cssText
+    edgePromptTemplate,
+    cssText,
+    cssHr,
+    jsHr,
 ) {
     'use strict';
 
@@ -57,8 +62,16 @@ define([
                     //
                     //     this.connectNodes(srcId, dstId, connId);
                     //
-                    console.log(`Found ${conns.length} valid connections.`);
-                    console.log(conns.map(c => c.name));
+                    var edgePrompt = _.template(edgePromptTemplate)({edge_types: conns.map(c => c.name)});
+                    var edgePromptDOM = $(edgePrompt);
+                    edgePromptDOM.find('#relation-dropdown').hierarchySelect({
+                        width: 459
+                    });
+                    edgePromptDOM.find("#select-button").click(function() {
+                        var selected_name = $(".selected-label").text();
+                        console.log(conns.find(x => x.name === selected_name));
+                    });
+                    edgePromptDOM.modal("show");
                 } else {
                     this.connectNodes(srcId, dstId, conns[0].id);
                 }
