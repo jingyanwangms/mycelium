@@ -16,11 +16,5 @@
     "title": "AutoViz",
     "panel": "panels/AutoViz/AutoVizPanel",
     "DEBUG_ONLY": false
-  },
-  {
-    "id": "ActionButton",
-    "title": "ActionButton",
-    "panel": "panels/ActionButton/ActionButtonPanel",
-    "DEBUG_ONLY": false
   }
 ]

@@ -9,10 +9,10 @@
         "widget": "src/visualizers/widgets/SemanticGraph"
       },
       "ActionButton": {
-        "src": "panels/ActionButton/ActionButtonPanel",
+        "src": "panels/ActionButton/ActionButton",
         "title": "ActionButton",
         "panel": "src/visualizers/panels/ActionButton",
-        "secondary": false,
+        "secondary": true,
         "widget": "src/visualizers/widgets/ActionButton"
       }
     },
