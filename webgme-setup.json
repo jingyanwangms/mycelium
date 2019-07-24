@@ -19,6 +19,9 @@
     "seeds": {
       "SemanticGraph": {
         "src": "src/seeds/SemanticGraph"
+      },
+      "SemanticGraph-test": {
+        "src": "src/seeds/SemanticGraph-test"
       }
     },
     "decorators": {

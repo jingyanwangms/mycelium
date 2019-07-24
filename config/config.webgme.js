@@ -11,6 +11,7 @@ config.visualization.layout.basePaths.push(__dirname + '/../node_modules/webgme-
 config.visualization.decoratorPaths.push(__dirname + '/../src/decorators');
 config.visualization.decoratorPaths.push(__dirname + '/../node_modules/webgme-easydag/src/decorators');
 config.seedProjects.basePaths.push(__dirname + '/../src/seeds/SemanticGraph');
+config.seedProjects.basePaths.push(__dirname + '/../src/seeds/SemanticGraph-test');
 
 
 
