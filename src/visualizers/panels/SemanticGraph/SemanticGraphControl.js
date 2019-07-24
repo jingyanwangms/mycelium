@@ -68,8 +68,76 @@ define([
         this._widget.createEdgeType = dict => {
             // TODO: Define a new meta node that inherits from 'Edge' or some specified base
         };
+
+        this._widget.getConnectableNodes = (nodeId, reverse) => {
+            const nodeIds = this._client.getNode(this._currentNodeId).getChildrenIds()
+                .filter(id => id !== nodeId);
+
+            return this.getConnectableNodes(nodeId, nodeIds, reverse);
+        };
     };
 
+    SemanticGraphControl.prototype.getConnectableNodes = function(src, dsts, reverse) {
+        var children = this._getAllValidChildren(this._currentNodeId),
+            connIds = [],
+            tgts = [],
+            validDsts,
+            typeId,
+            node,
+            i;
+
+        for (i = children.length; i--;) {
+            node = this._client.getNode(children[i]);
+            if (node.isConnection()) {
+                // If the conn can start at src, record it
+                if (this.connCanStartAt(src, children[i], reverse)) {
+                    connIds.push(children[i]);
+                }
+            }
+        }
+
+        // Store the valid target types for each connection
+        validDsts = this.getDstToConnIds(connIds);
+        for (i = dsts.length; i--;) {
+            node = this._client.getNode(dsts[i]);
+            typeId = node.getMetaTypeId();
+            if (src !== dsts[i] && validDsts[typeId]) {
+                tgts.push({
+                    node: this._getObjectDescriptor(dsts[i]),
+                    conns: validDsts[typeId].map(id => this._getObjectDescriptor(id))
+                });
+            }
+        }
+
+        return tgts;
+    };
+
+    SemanticGraphControl.prototype.getDstToConnIds = function(connIds, reverse) {
+        var dstDict = {},
+            descs,
+            items,
+            ptr = reverse ? 'src' : 'dst';
+
+        for (var i = connIds.length; i--;) {
+            items = this._client.getPointerMeta(connIds[i], ptr).items;
+            for (var j = items.length; j--;) {
+                // Get all descendents
+                descs = this._getAllDescendentIds(items[j].id);
+                if (!dstDict[items[j].id]) {
+                    dstDict[items[j].id] = [];
+                }
+                dstDict[items[j].id].push(connIds[i]);
+
+                for (var k = descs.length; k--;) {
+                    if (!dstDict[descs[k]]) {
+                        dstDict[descs[k]] = [];
+                    }
+                    dstDict[descs[k]].push(connIds[i]);
+                }
+            }
+        }
+        return dstDict;
+    };
     /* * * * * * * * Visualizer content update callbacks * * * * * * * */
     // One major concept here is with managing the territory. The territory
     // defines the parts of the project that the visualizer is interested in

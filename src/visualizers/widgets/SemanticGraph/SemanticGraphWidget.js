@@ -30,6 +30,78 @@ define([
     SemanticGraphWidget.prototype = Object.create(EasyDAGWidget.prototype);
 
     SemanticGraphWidget.prototype.SelectionManager = SelectionManager;
+
+    SemanticGraphWidget.prototype.startConnectionFrom = function (item) {
+        const validPairs = this.getConnectableNodes(item.id);
+        console.log(validPairs);
+        this.startConnection(item, validPairs);
+    };
+
+    SemanticGraphWidget.prototype.startConnectionTo = function (item) {
+        const validPairs = this.getConnectableNodes(item.id);
+        console.log(validPairs);
+        this.startConnection(item, validPairs, true);
+    };
+
+    SemanticGraphWidget.prototype.startConnection = function (src, dsts, reverse) {
+        var onClick = (clicked, conns) => {
+                var srcId = !reverse ? src.id : clicked.id,
+                    dstId = !reverse ? clicked.id : src.id;
+
+                d3.event.stopPropagation();
+                this.resetConnectingState();
+                if (conns.length > 1) {
+                    // TODO: Prompt the user for the edge type!
+                    // After we have determined the actual connection to create,
+                    // call:
+                    //
+                    //     this.connectNodes(srcId, dstId, connId);
+                    //
+                    console.log(`Found ${conns.length} valid connections.`);
+                    console.log(conns.map(c => c.name));
+                } else {
+                    this.connectNodes(srcId, dstId, conns[0].id);
+                }
+            },
+            pairs = dsts.map(pair => [this.items[pair.node.id], pair.conns]);
+
+        this.resetConnectingState();
+        this._connectionSrc = src;
+        const tuples = pairs.map(pair => {
+            var item = pair[0],
+                connIds = pair[1];
+
+            return [
+                item,
+                connIds,
+                item.showIcon({
+                    x: 0.5,
+                    y: !reverse ? 0 : 1,
+                    icon: 'chevron-bottom'
+                })
+            ];
+        });
+
+        tuples.forEach(pair => pair[2].on('click', () => onClick(pair[0], pair[1])));
+
+        // Create the 'create-new' icon for the src
+        const srcIcon = src.showIcon({
+            x: 0.5,
+            y: !reverse ? 1 : 0,
+            icon: 'plus'
+        });
+        srcIcon.on('click', () => {
+            d3.event.stopPropagation();
+            this.resetConnectingState();
+            this.onAddButtonClicked(src, reverse);
+        });
+
+        this._connectionOptions = tuples.map(tuple => [tuple[0], tuple[2]]);
+        this._connectionSrc = [src, srcIcon];
+
+        this._connecting = true;
+    };
+
     SemanticGraphWidget.prototype.refreshScreen = function () {
         if (!this.active) {
             return;
