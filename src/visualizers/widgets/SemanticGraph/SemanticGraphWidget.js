@@ -33,13 +33,11 @@ define([
 
     SemanticGraphWidget.prototype.startConnectionFrom = function (item) {
         const validPairs = this.getConnectableNodes(item.id);
-        console.log(validPairs);
         this.startConnection(item, validPairs);
     };
 
     SemanticGraphWidget.prototype.startConnectionTo = function (item) {
         const validPairs = this.getConnectableNodes(item.id);
-        console.log(validPairs);
         this.startConnection(item, validPairs, true);
     };
 
@@ -50,12 +48,17 @@ define([
 
                 d3.event.stopPropagation();
                 this.resetConnectingState();
+
                 if (conns.length > 1) {
                     // TODO: Prompt the user for the edge type!
                     // After we have determined the actual connection to create,
                     // call:
                     //
                     //     this.connectNodes(srcId, dstId, connId);
+                    //
+                    // New connection type can be created with:
+                    //
+                    //     this.createConnectionType(name, baseName);
                     //
                     console.log(`Found ${conns.length} valid connections.`);
                     console.log(conns.map(c => c.name));

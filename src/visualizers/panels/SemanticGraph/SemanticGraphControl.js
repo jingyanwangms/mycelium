@@ -5,8 +5,14 @@
 
 define([
     'panels/EasyDAG/EasyDAGControl',
+    'js/RegistryKeys',
+    'js/Constants',
+    'js/Panels/MetaEditor/MetaEditorConstants',
 ], function (
-    EasyDAGControl
+    EasyDAGControl,
+    REGISTRY_KEYS,
+    CONSTANTS,
+    META_CONSTANTS,
 ) {
 
     'use strict';
@@ -57,16 +63,12 @@ define([
             // TODO
         };
 
-        this._widget.createEdge = dict => {
-            // TODO
+        this._widget.createConnectionType = (name, type) => {
+            this.createNew(name, type);
         };
 
         this._widget.createNodeType = dict => {
             // TODO
-        };
-
-        this._widget.createEdgeType = dict => {
-            // TODO: Define a new meta node that inherits from 'Edge' or some specified base
         };
 
         this._widget.getConnectableNodes = (nodeId, reverse) => {
@@ -75,6 +77,73 @@ define([
 
             return this.getConnectableNodes(nodeId, nodeIds, reverse);
         };
+    };
+
+    SemanticGraphControl.prototype.createNew = function(name, type, metasheetName='META') {
+        const client = this._client;
+        const baseId = client.getAllMetaNodes()
+                .find(node => node.getAttribute('name') === type)
+                .getId();
+
+        // Store the new node in the "Language" container
+        const parentId = client.getAllMetaNodes()
+            .find(node => node.getAttribute('name') === 'Language')
+            .getId();
+
+        const msg = `Created new ${type + (metasheetName ? ' prototype' : '')}`;
+        client.startTransaction(msg);
+
+        const newId = client.createNode({parentId, baseId});
+
+        // Set isAbstract false, if needed
+        const baseNode = client.getNode(baseId);
+        if (baseNode.getRegistry('isAbstract')) {
+            client.setRegistry(newId, 'isAbstract', false);
+        }
+        client.setAttribute(newId, 'name', name);
+
+        this.addToMetaSheet(newId, metasheetName);
+
+        client.completeTransaction();
+
+        return newId;
+    };
+
+    SemanticGraphControl.prototype.addToMetaSheet = function(nodeId, metasheetName) {
+        var root = this._client.getNode(CONSTANTS.PROJECT_ROOT_ID),
+            metatabs = root.getRegistry(REGISTRY_KEYS.META_SHEETS),
+            metatab = metatabs.find(tab => tab.title === metasheetName) || metatabs[0],
+            metatabId = metatab.SetID;
+
+        // Add to the general meta
+        this._client.addMember(
+            CONSTANTS.PROJECT_ROOT_ID,
+            nodeId,
+            META_CONSTANTS.META_ASPECT_SET_NAME
+        );
+        this._client.setMemberRegistry(
+            CONSTANTS.PROJECT_ROOT_ID,
+            nodeId,
+            META_CONSTANTS.META_ASPECT_SET_NAME,
+            REGISTRY_KEYS.POSITION,
+            {
+                x: 100,
+                y: 100
+            }
+        );
+
+        // Add to the specific sheet
+        this._client.addMember(CONSTANTS.PROJECT_ROOT_ID, nodeId, metatabId);
+        this._client.setMemberRegistry(
+            CONSTANTS.PROJECT_ROOT_ID,
+            nodeId,
+            metatabId,
+            REGISTRY_KEYS.POSITION,
+            {
+                x: 100,
+                y: 100
+            }
+        );
     };
 
     SemanticGraphControl.prototype.getConnectableNodes = function(src, dsts, reverse) {
