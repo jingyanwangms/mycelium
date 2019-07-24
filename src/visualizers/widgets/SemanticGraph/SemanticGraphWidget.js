@@ -95,13 +95,18 @@ define([
                     var conn_id = conns.find(x => x.name === selected_name).id;
                     // TODO: this does not create the connection!
                     this.connectNodes(srcId, dstId, conn_id);
-                    // TODO: remove modal properly!
+                    edgePromptDOM.on('hidden.bs.modal', function (e) {
+                        edgePromptDOM.remove();
+                    });
                     edgePromptDOM.modal("hide");
                 });
                 edgePromptDOM.find("#add-new-button").click(() => {
                     var selected_name = $(".selected-label").text();
                     var newConnId = this.createConnectionType($("#new-relation").val(), selected_name);
                     this.connectNodes(srcId, dstId, newConnId);
+                    edgePromptDOM.on('hidden.bs.modal', function (e) {
+                        edgePromptDOM.remove();
+                    });                
                     edgePromptDOM.modal("hide");
                 });
                 edgePromptDOM.modal("show");
