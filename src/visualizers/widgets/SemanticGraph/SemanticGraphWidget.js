@@ -8,6 +8,7 @@ define([
     'widgets/EasyDAG/EasyDAGWidget',
     './lib/elk.bundled',
     './SelectionManager',
+    './Connection',
     'underscore',
     'text!./templates/edge_prompt.html.ejs',  // example loading text w/ requirejs
     'css!./styles/SemanticGraphWidget.css',
@@ -17,6 +18,7 @@ define([
     EasyDAGWidget,
     ELK,
     SelectionManager,
+    Connection,
     _,
     edgePromptTemplate,
     cssText,
@@ -26,15 +28,47 @@ define([
     'use strict';
 
     const elk = new ELK()
-    var WIDGET_CLASS = 'semantic-graph';
+    const WIDGET_CLASS = 'semantic-graph';
+    const ConnectionColors = [
+        '#9e9e9e',  // grey
+        '#ff8a65',  // deep-orange
+        '#7986cb',  // indigo
+        '#e57373',  // red
+        '#e91e63',  // pink
+    ];
+    const ConnectionDashes = [ null, '4', '4 1', '4 1 2' ];
+    const ConnectionStyles = ConnectionDashes
+        .map(d => ConnectionColors.map(c => [c, d]))
+        .reduce((l1, l2) => l1.concat(l2), []);
 
     function SemanticGraphWidget(logger, container) {
         EasyDAGWidget.apply(this, arguments);
+        this.connectionStyles = {};
     }
 
     SemanticGraphWidget.prototype = Object.create(EasyDAGWidget.prototype);
 
     SemanticGraphWidget.prototype.SelectionManager = SelectionManager;
+    SemanticGraphWidget.prototype.Connection = Connection;
+
+    SemanticGraphWidget.prototype.initSvgDefs = function () {
+        EasyDAGWidget.prototype.initSvgDefs.call(this);
+        const defs = this._$svg.select("defs");
+
+        // Define connection markers for each color
+        ConnectionColors.forEach(color => {
+            defs.append("marker")
+                .attr("id", `arrowhead-${color}`)
+                .attr('fill', color)
+                .attr("refX", 5.25)
+                .attr("refY", 2)
+                .attr("markerWidth", 6)
+                .attr("markerHeight", 4)
+                .attr("orient", "auto")
+                .append("path")
+                        .attr("d", "M 0,0 V 4 L6,2 Z");
+        });
+    };
 
     SemanticGraphWidget.prototype.startConnectionFrom = function (item) {
         const validPairs = this.getConnectableNodes(item.id);
@@ -176,6 +210,7 @@ define([
         return elk.layout(graph)
             .then(graph => {
                 this.queueFns([
+                    this.setConnectionStyles.bind(this),
                     this.updateTranslation.bind(this),
                     this.refreshItems.bind(this, graph),
                     this.refreshConnections.bind(this, graph),
@@ -206,8 +241,32 @@ define([
             .attr('transform', `translate(${shift.x},${shift.y}) scale(${zoom})`);
     };
 
+    SemanticGraphWidget.prototype.setConnectionStyles = function () {
+        // Remove styles for unused types (if we switch projects or something)
+        const currentTypes = this.getAllConnectionTypes();
+        const prevTypes = Object.keys(this.connectionStyles);
+        const oldTypes = _.difference(prevTypes, currentTypes);
+        oldTypes.forEach(type => delete this.connectionStyles[type]);
+
+        const usedStyles = Object.values(this.connectionStyles);
+        const remainingStyles = _.difference(ConnectionStyles, usedStyles);
+
+        currentTypes.map(data => data.name)
+            .forEach(type => {
+                if (!this.connectionStyles[type]) {
+                    if (remainingStyles.length === 0) {
+                        console.warn('Used all existing styles. Reusing styles for edges.');
+                        remainingStyles = ConnectionStyles.slice();
+                    }
+
+                    this.connectionStyles[type] = remainingStyles.shift();
+                }
+            });
+    };
+
     SemanticGraphWidget.prototype.refreshExtras = function () {
         this.updateEmptyMsg();
+        // TODO: Refresh the legend
     };
 
     SemanticGraphWidget.prototype.refreshConnections = function (graph) {
@@ -221,11 +280,15 @@ define([
                 continue;
             }
 
-            this.connections[id].points = graph.edges[i].sections
+            const conn = this.connections[id];
+            conn.points = graph.edges[i].sections
                 .map(sec => sec.endPoint);
 
-            this.connections[id].points.unshift(graph.edges[i].sections[0].startPoint);
-            this.connections[id].redraw();
+            conn.points.unshift(graph.edges[i].sections[0].startPoint);
+
+            const style = this.connectionStyles[conn.desc.baseName];
+            conn.setStyle.apply(conn, style);
+            conn.redraw();
         }
     };
 
