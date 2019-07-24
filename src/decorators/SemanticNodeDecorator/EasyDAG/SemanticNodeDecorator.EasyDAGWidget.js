@@ -28,6 +28,11 @@ define([
         return this._node.attributes.name.value;
     };
 
+    SemanticNodeDecorator.prototype.updateShape = function(params) {
+        params.ry = params.rx = 0;  // ignore rounding of edges
+        EllipseDecorator.prototype.updateShape.call(this, params);
+    };
+
     SemanticNodeDecorator.prototype.expand =  SemanticNodeDecorator.prototype.condense;
 
     return SemanticNodeDecorator;
