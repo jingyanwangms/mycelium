@@ -1,7 +1,8 @@
 /*globals define, $, d3, _*/
 define([
     'q',
-    'text!./AddPaperDialog.html.ejs',
+    'text!./templates/AddPaperDialog.html.ejs',
+    'css!./styles/AddPaperDialog.css',
 ], function(
     Q,
     AddPaperTemplate,

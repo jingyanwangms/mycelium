@@ -1,4 +1,4 @@
-<div class="add-node-dialog modal fade" tabindex="-1" role="dialog">
+<div class="add-paper-dialog modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
         <div class="modal-header">
@@ -30,7 +30,8 @@
                          <form>
                             <% schema.attributes.forEach((attr, i) => { %>
                                 <label><%= attr.name %></label>
-                                <input id="attr-<%= attr.name %>" class="form-control" type="string"></input>
+                                <!-- This is a little bit of a hack. Ideally this would check if the attribute is a multiline string. -->
+                                <<%= attr.name === 'description' ? 'textarea' : 'input' %> id="attr-<%= attr.name %>" class="form-control" type="string" <%= attr.name === 'name' ? 'required' : '' %>></<%= attr.name === 'description' ? 'textarea' : 'input' %>>
                             <% }); %>
                         </form>
                     </div>
