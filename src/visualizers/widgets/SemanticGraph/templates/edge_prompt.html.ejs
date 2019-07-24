@@ -8,7 +8,7 @@
                 <h4 class="modal-title" id="modalLabelSmall">title</h4>
             </div>
             <div class="modal-body">
-                <div>
+                <form id="edge-prompt-form" action="javascript:void(0);">
                     <div><label for="relation">Select relation</label></div>
                     <div style="margin-right: 15px;" class="btn-group hierarchy-select" 
                          ata-resize="auto" id="relation-dropdown">
@@ -32,11 +32,12 @@
                         <input class="hidden hidden-field" name="relation" readonly="readonly" aria-hidden="true" type="text"/>
                     </div>
                     <button style="width: 80px;" type="button" id="select-button" class="btn btn-primary">Select</button>
+                    
                     <div style="margin-top: 10px;"><label for="new-relation">Or specify new relation</label></div>
-                    <input style="width: 459px; margin-right: 15px; display: inline-block;" class="form-control" 
+                    <input required="required" style="width: 459px; margin-right: 15px; display: inline-block;" class="form-control" 
                             id="new-relation" placeholder="as a child of what you select above">
                     <button style="width: 80px;" type="button" id="add-new-button" class="btn btn-warning">Add new</button>
-                </div>
+                </form>
             </div>
         </div>
     </div>

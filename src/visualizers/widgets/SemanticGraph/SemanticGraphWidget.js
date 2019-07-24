@@ -134,8 +134,13 @@ define([
                     edgePromptDOM.modal("hide");
                 });
                 edgePromptDOM.find("#add-new-button").click(() => {
+                    document.forms['edge-prompt-form'].reportValidity();
                     var selected_name = $(".selected-label").text();
-                    var newConnId = this.createConnectionType($("#new-relation").val(), selected_name);
+                    var new_conn_name = $("#new-relation").val();
+                    if (!new_conn_name) {
+                        return;
+                    }
+                    var newConnId = this.createConnectionType(new_conn_name, selected_name);
                     this.connectNodes(srcId, dstId, newConnId);
                     edgePromptDOM.on('hidden.bs.modal', function (e) {
                         edgePromptDOM.remove();
