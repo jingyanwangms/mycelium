@@ -1,0 +1,32 @@
+<div class="add-node-dialog modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="pre-body">
+                <div class="tabContainer"></div>
+            </div>
+            <div class="modal-body">
+                  <% if (options.tabs) { %>
+                    <div class="tabbable">
+                        <ul class="nav nav-tabs">
+                        <% options.tabs.forEach((tab, i) => { %>
+                            <li <%= i === 0 ? 'class="active"' : '' %>><a href="#<%= tab %>" data-toggle="tab"><%= tab.type %></a></li>
+                        <% }); %>
+                        </ul>
+                        <div class="tab-content" id="node-container">
+<!--                             <form>
+                                <% options.tabs.forEach((tab, i) => { %>
+                                    <% tab.attributes.forEach((attr, i) => { %>
+                                        <label><%= attr.name %></label>
+                                    <% }); %>
+                                <% }); %>
+                            </form> -->
+                        </div>
+                    </div>
+                    <% } else { %>
+                    <div class="container-fluid" id="node-container">
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+    </div>
+</div>
