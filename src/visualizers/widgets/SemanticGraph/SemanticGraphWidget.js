@@ -9,14 +9,19 @@ define([
     './lib/elk.bundled',
     './SelectionManager',
     'underscore',
-    'text!./styles/SemanticGraphWidget.css',  // example loading text w/ requirejs
-    'css!./styles/SemanticGraphWidget.css'
+    'text!./templates/edge_prompt.html.ejs',  // example loading text w/ requirejs
+    'css!./styles/SemanticGraphWidget.css',
+    'css!./styles/hierarchy-select.min.css',
+    './styles/hierarchy-select.min',
 ], function (
     EasyDAGWidget,
     ELK,
     SelectionManager,
     _,
-    cssText
+    edgePromptTemplate,
+    cssText,
+    cssHr,
+    jsHr,
 ) {
     'use strict';
 
@@ -60,10 +65,52 @@ define([
                     //
                     //     this.createConnectionType(name, baseName);
                     //
-                    console.log(`Found ${conns.length} valid connections.`);
-                    console.log(conns.map(c => c.name));
-                    // The following fn will get all connection types (including their base type)
-                    console.log(this.getAllConnectionTypes());
+                    var all_connections = this.getAllConnectionTypes();
+                    // preparing connections to be shown
+                    var conns_dict = {};
+                    for (var i = 0; i < all_connections.length; i++) {
+                        var cur_con = all_connections[i];
+                        if (!conns_dict.hasOwnProperty(cur_con.base)) {
+                            conns_dict[cur_con.base] = [];
+                        }
+                        conns_dict[cur_con.base].push(cur_con.name);                        
+                    }
+                    console.log(conns_dict);
+                    function prepareConsDict(conns_dict, key, level) {
+                        var prepared_cons = [];
+                        prepared_cons.push([key, level]);
+                        if (!conns_dict.hasOwnProperty(key)) {
+                            return prepared_cons;
+                        }
+                        var cur_list = conns_dict[key];
+                        for (var i = 0; i < cur_list.length; i++) {
+                            var lower_list = prepareConsDict(conns_dict, cur_list[i], level + 1);
+                            prepared_cons.push(...lower_list);
+                        }
+                        return prepared_cons;
+                    }
+                    var prepared_cons = [];
+                    var first_dict = conns_dict["Edge"];
+                    for (var i = 0; i < first_dict.length; i++) {
+                        prepared_cons.push(...prepareConsDict(conns_dict, first_dict[i], 1));
+                    }
+                    // TODO: exclude author and such
+
+                    var edgePrompt = _.template(edgePromptTemplate)({edge_types: prepared_cons});
+                    var edgePromptDOM = $(edgePrompt);
+                    edgePromptDOM.find('#relation-dropdown').hierarchySelect({
+                        width: 459
+                    });
+                    edgePromptDOM.find("#select-button").click(() => {
+                        var selected_name = $(".selected-label").text();
+                        var conn_id = conns.find(x => x.name === selected_name).id;
+                        this.connectNodes(srcId, dstId, conn_id);
+                        // TODO: close modal
+                    });
+                    edgePromptDOM.find("#add-new-button").click(function() {
+                        alert("This is not supported yet!");
+                    });
+                    edgePromptDOM.modal("show");
                 } else {
                     this.connectNodes(srcId, dstId, conns[0].id);
                 }
