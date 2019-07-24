@@ -71,6 +71,16 @@ define([
             // TODO
         };
 
+        this._widget.getAllConnectionTypes = () => {
+            const metanodes = this._client.getAllMetaNodes();
+            const baseConnType = metanodes.find(node => node.getAttribute('name') == 'Edge');
+            const connTypes = metanodes.filter(node => node.isTypeOf(baseConnType.getId()));
+            return connTypes.map(node => ({
+                name: node.getAttribute('name'),
+                base: this._client.getNode(node.getBaseId()).getAttribute('name')
+            }));
+        };
+
         this._widget.getConnectableNodes = (nodeId, reverse) => {
             const nodeIds = this._client.getNode(this._currentNodeId).getChildrenIds()
                 .filter(id => id !== nodeId);

@@ -62,6 +62,8 @@ define([
                     //
                     console.log(`Found ${conns.length} valid connections.`);
                     console.log(conns.map(c => c.name));
+                    // The following fn will get all connection types (including their base type)
+                    console.log(this.getAllConnectionTypes());
                 } else {
                     this.connectNodes(srcId, dstId, conns[0].id);
                 }
