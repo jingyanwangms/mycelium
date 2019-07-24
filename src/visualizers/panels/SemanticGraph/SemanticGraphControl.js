@@ -64,7 +64,7 @@ define([
         };
 
         this._widget.createConnectionType = (name, type) => {
-            this.createNew(name, type);
+            return this.createNew(name, type);
         };
 
         this._widget.createNodeType = dict => {
@@ -101,7 +101,7 @@ define([
             .getId();
 
         const msg = `Created new ${type + (metasheetName ? ' prototype' : '')}`;
-        client.startTransaction(msg);
+        //client.startTransaction(msg);
 
         const newId = client.createNode({parentId, baseId});
 
@@ -114,7 +114,7 @@ define([
 
         this.addToMetaSheet(newId, metasheetName);
 
-        client.completeTransaction();
+        //client.completeTransaction();
 
         return newId;
     };

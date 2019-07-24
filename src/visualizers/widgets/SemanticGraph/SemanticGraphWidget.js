@@ -88,66 +88,57 @@ define([
                 d3.event.stopPropagation();
                 this.resetConnectingState();
 
-                if (conns.length > 1) {
-                    // TODO: Prompt the user for the edge type!
-                    // After we have determined the actual connection to create,
-                    // call:
-                    //
-                    //     this.connectNodes(srcId, dstId, connId);
-                    //
-                    // New connection type can be created with:
-                    //
-                    //     this.createConnectionType(name, baseName);
-                    //
-                    var all_connections = this.getAllConnectionTypes();
-                    // preparing connections to be shown
-                    var conns_dict = {};
-                    for (var i = 0; i < all_connections.length; i++) {
-                        var cur_con = all_connections[i];
-                        if (!conns_dict.hasOwnProperty(cur_con.base)) {
-                            conns_dict[cur_con.base] = [];
-                        }
-                        conns_dict[cur_con.base].push(cur_con.name);                        
+                var all_connections = this.getAllConnectionTypes();
+                // preparing connections to be shown
+                var conns_dict = {};
+                for (var i = 0; i < all_connections.length; i++) {
+                    var cur_con = all_connections[i];
+                    if (!conns_dict.hasOwnProperty(cur_con.base)) {
+                        conns_dict[cur_con.base] = [];
                     }
-                    console.log(conns_dict);
-                    function prepareConsDict(conns_dict, key, level) {
-                        var prepared_cons = [];
-                        prepared_cons.push([key, level]);
-                        if (!conns_dict.hasOwnProperty(key)) {
-                            return prepared_cons;
-                        }
-                        var cur_list = conns_dict[key];
-                        for (var i = 0; i < cur_list.length; i++) {
-                            var lower_list = prepareConsDict(conns_dict, cur_list[i], level + 1);
-                            prepared_cons.push(...lower_list);
-                        }
+                    conns_dict[cur_con.base].push(cur_con.name);                        
+                }
+                function prepareConsDict(conns_dict, key, level) {
+                    var prepared_cons = [];
+                    prepared_cons.push([key, level]);
+                    if (!conns_dict.hasOwnProperty(key)) {
                         return prepared_cons;
                     }
-                    var prepared_cons = [];
-                    var first_dict = conns_dict["Edge"];
-                    for (var i = 0; i < first_dict.length; i++) {
-                        prepared_cons.push(...prepareConsDict(conns_dict, first_dict[i], 1));
+                    var cur_list = conns_dict[key];
+                    for (var i = 0; i < cur_list.length; i++) {
+                        var lower_list = prepareConsDict(conns_dict, cur_list[i], level + 1);
+                        prepared_cons.push(...lower_list);
                     }
-                    // TODO: exclude author and such
-
-                    var edgePrompt = _.template(edgePromptTemplate)({edge_types: prepared_cons});
-                    var edgePromptDOM = $(edgePrompt);
-                    edgePromptDOM.find('#relation-dropdown').hierarchySelect({
-                        width: 459
-                    });
-                    edgePromptDOM.find("#select-button").click(() => {
-                        var selected_name = $(".selected-label").text();
-                        var conn_id = conns.find(x => x.name === selected_name).id;
-                        this.connectNodes(srcId, dstId, conn_id);
-                        // TODO: close modal
-                    });
-                    edgePromptDOM.find("#add-new-button").click(function() {
-                        alert("This is not supported yet!");
-                    });
-                    edgePromptDOM.modal("show");
-                } else {
-                    this.connectNodes(srcId, dstId, conns[0].id);
+                    return prepared_cons;
                 }
+                var prepared_cons = [];
+                var first_dict = conns_dict["Edge"];
+                for (var i = 0; i < first_dict.length; i++) {
+                    prepared_cons.push(...prepareConsDict(conns_dict, first_dict[i], 1));
+                }
+                // TODO: exclude author and such
+
+                var edgePrompt = _.template(edgePromptTemplate)({edge_types: prepared_cons});
+                var edgePromptDOM = $(edgePrompt);
+                edgePromptDOM.find('#relation-dropdown').hierarchySelect({
+                    width: 459
+                });
+                edgePromptDOM.find("#select-button").click(() => {
+                    var selected_name = $(".selected-label").text();
+                    console.log(selected_name);
+                    var conn_id = conns.find(x => x.name === selected_name).id;
+                    // TODO: this does not create the connection!
+                    this.connectNodes(srcId, dstId, conn_id);
+                    // TODO: remove modal properly!
+                    edgePromptDOM.modal("hide");
+                });
+                edgePromptDOM.find("#add-new-button").click(() => {
+                    var selected_name = $(".selected-label").text();
+                    var newConnId = this.createConnectionType($("#new-relation").val(), selected_name);
+                    this.connectNodes(srcId, dstId, newConnId);
+                    edgePromptDOM.modal("hide");
+                });
+                edgePromptDOM.modal("show");
             },
             pairs = dsts.map(pair => [this.items[pair.node.id], pair.conns]);
 
