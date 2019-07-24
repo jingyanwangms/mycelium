@@ -1,6 +1,9 @@
 <div class="add-node-dialog modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title"><%= title %></h4>
+        </div>
             <div class="pre-body">
                 <div class="tabContainer"></div>
             </div>
@@ -24,9 +27,19 @@
                     </div>
                     <% } else { %>
                     <div class="container-fluid" id="node-container">
+                         <form>
+                            <% schema.attributes.forEach((attr, i) => { %>
+                                <label><%= attr.name %></label>
+                                <input id="attr-<%= attr.name %>" class="form-control" type="string"></input>
+                            <% }); %>
+                        </form>
                     </div>
                     <% } %>
             </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary create">Create</button>
+          </div>
         </div>
     </div>
 </div>

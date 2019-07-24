@@ -17,147 +17,79 @@ define([
         this.opts = _.extend({}, DEFAULT_OPTS, opts);
         this._template = _.template(this.opts.html || AddPaperTemplate);
         this._dialog = null;
-        this.containers = [];
-        this.types = [  {
-            "type": "Paper",
-            "attributes": [
-              {
-                "name": "name",
-                "type": "string",
-                "value": "P2"
-              },
-              {
-                "name": "displayName",
-                "type": "string",
-                "value": ""
-              },
-              {
-                "name": "description",
-                "type": "string",
-                "value": ""
-              }
-            ]
-          },
-          {
-            "type": "SubGraph",
-            "attributes": [
-              {
-                "name": "name",
-                "type": "string",
-                "value": "SubGraph"
-              }
-            ]
-          },
-          {
-            "type": "Person",
-            "attributes": [
-              {
-                "name": "name",
-                "type": "string",
-                "value": "Some Researcher"
-              }
-            ]
-          }
-        ]
     };
 
-     AddPaperDialog.prototype.show = function(title, pairs) {
+     AddPaperDialog.prototype.show = function(schema) {
          // Populate the template
-        var container,
-            content,
+        var content,
             noNodeMsg;
 
         // Create the dialog and add the nodes
-        //this.containers = this.types.map(p => new Container(p));
-        this.opts.tabs = this.types;
+        const title = `Create new ${schema.type}`;
+
         content = this._template({
             options: this.opts,
+            schema,
             title
         });
 
         this._dialog = $(content);
-        container = this._dialog.find('#node-container');
+        const btn = this._dialog.find('.create');
+        btn.on('click', () => {
+            const data = {};
+            schema.attributes.forEach(attr => {
+                data[attr.name] = this._dialog.find(`#attr-${attr.name}`).val();
+            });
 
-        if (this.types.length) {
-            if (this.opts.tabs) {
-                this._addTabbed(container);
-            } else {
-                this._addBasic(container);
+            if (data.name) {
+                this.onCreate(data);
+                this._dialog.modal('hide');
             }
+        });
 
-/*             this.containers
-                .forEach(node => {
-                    node.html.onclick = this.onNodeClicked.bind(this, node.pair);
-                }); */
-        } else {
-            noNodeMsg = $('<div>', {class: 'empty-msg'});
-            noNodeMsg.text(this.opts.emptyMsg);
-            container.append(noNodeMsg);
-        } 
         this._dialog.modal('show');
     }; 
 
-    AddPaperDialog.prototype._addTabbed = function(container) {
-        var pane,
-            containersByTab = {},
-            className;
-
-        this.opts.tabs.forEach((tab, i) => {
-            className = 'tab-pane';
-            if (i === 0) {
-                className += ' active';
-            }
-
-            pane = $('<div>', {
-                id: tab,
-                class: className,
-            });
-
-            // Add the nodes to the pane
-/*             containersByTab[tab] = this.containers
-                .filter(cntr => this.opts.tabFilter(tab, cntr.pair));
-
-            containersByTab[tab].forEach(cntr => pane.append(cntr.html)); */
-            pane.append('<form>');
-            tab.attributes.forEach(attr => {
-                pane.append('<div class="form-group">');
-                pane.append('<label>' + attr.name + '</label>');
-                pane.append('<input type="' + attr.type + '" class="form-control">');
-                pane.append('</div>');
-            });
-            pane.append('</form>');
-
-            container.append(pane);
-        });
-
-        // Update the sizes of nodes in the first tab
-/*         this._dialog.on('shown.bs.modal', () =>
-            containersByTab[this.opts.tabs[0]].forEach(cntr => cntr.updateSize())
-        ); */
-
-        this._dialog.on('hide.bs.modal', () => this.empty());
-        this._dialog.on('hidden.bs.modal', () => this._dialog.remove());
-        
-
-/*         this._dialog.on('shown.bs.tab', 'a[data-toggle="tab"]', (event) => {
-            var tabName = event.target.getAttribute('href').substring(1);
-            containersByTab[tabName].forEach(cntr => cntr.updateSize());
-        }); */
-    };
-
-
-    AddPaperDialog.prompt = function(nodes, opts) {
+    AddPaperDialog.prompt = function(node, opts) {
         var deferred = Q.defer();
 
         // Create the modal view with all possible subsequent nodes
-        var dialog = new AddPaperDialog(opts);
-        dialog.show(null, nodes);
-        dialog.onSelect = pair => {
+        const schema = AddPaperDialog.getSchema(node);
+        const dialog = new AddPaperDialog(opts);
+        dialog.show(schema);
+        dialog.onCreate = pair => {
+            console.log('data is', pair);
             if (pair) {
                 deferred.resolve(pair);
             }
         };
         return deferred.promise;
     };
+
+    AddPaperDialog.getSchema = function(node) {
+        const schema = {
+            type: node.getAttribute('name'),
+            attributes: [],
+        };
+
+        node.getValidAttributeNames()
+            .forEach((name) => {
+                var meta = node.getAttributeMeta(name),
+                    type;
+
+                if (meta) {  // skip meta-invalid properties
+                    type = meta.type;
+                    schema.attributes.push({
+                        name: name,
+                        type: type,
+                        values: meta.enum,
+                        value: node.getAttribute(name)
+                    });
+                }
+            });
+
+        return schema;
+    };
+
     return AddPaperDialog;
 });
