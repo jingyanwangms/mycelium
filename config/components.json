@@ -1,4 +1,7 @@
 {
+    "GenericUIProjectNavigatorController": {
+        "rootDisplayName": "Mycelium"
+    },
     "CHFLayout": {
         "panels": [
             {

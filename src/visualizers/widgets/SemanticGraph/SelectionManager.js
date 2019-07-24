@@ -20,7 +20,7 @@ define([
         var btn;
 
         // Check that the base type
-        if (!this.selectedItem.isConnection) {
+        if (this.selectedItem.desc.baseName === 'Paper') {
             btn = new Buttons.ShowMore({
                 $pEl: this.$selection,
                 context: this._widget,

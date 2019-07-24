@@ -23,8 +23,8 @@
                             </div>
                             <ul class="dropdown-menu inner" role="menu">
                                 <% _.each(edge_types, function(item, key, list) { %>
-                                    <li data-value="<%- key %>" data-level="1">
-                                        <a href="#"><%- item %></a>
+                                    <li data-value="<%- key %>" data-level="<%- item[1] %>">
+                                        <a href="#"><%- item[0] %></a>
                                     </li>
                                 <% }); %>
                             </ul>

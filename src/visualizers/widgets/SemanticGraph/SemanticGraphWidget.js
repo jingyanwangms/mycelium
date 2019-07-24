@@ -38,13 +38,11 @@ define([
 
     SemanticGraphWidget.prototype.startConnectionFrom = function (item) {
         const validPairs = this.getConnectableNodes(item.id);
-        console.log(validPairs);
         this.startConnection(item, validPairs);
     };
 
     SemanticGraphWidget.prototype.startConnectionTo = function (item) {
         const validPairs = this.getConnectableNodes(item.id);
-        console.log(validPairs);
         this.startConnection(item, validPairs, true);
     };
 
@@ -55,6 +53,7 @@ define([
 
                 d3.event.stopPropagation();
                 this.resetConnectingState();
+
                 if (conns.length > 1) {
                     // TODO: Prompt the user for the edge type!
                     // After we have determined the actual connection to create,
@@ -62,14 +61,54 @@ define([
                     //
                     //     this.connectNodes(srcId, dstId, connId);
                     //
-                    var edgePrompt = _.template(edgePromptTemplate)({edge_types: conns.map(c => c.name)});
+                    // New connection type can be created with:
+                    //
+                    //     this.createConnectionType(name, baseName);
+                    //
+                    var all_connections = this.getAllConnectionTypes();
+                    // preparing connections to be shown
+                    var conns_dict = {};
+                    for (var i = 0; i < all_connections.length; i++) {
+                        var cur_con = all_connections[i];
+                        if (!conns_dict.hasOwnProperty(cur_con.base)) {
+                            conns_dict[cur_con.base] = [];
+                        }
+                        conns_dict[cur_con.base].push(cur_con.name);                        
+                    }
+                    console.log(conns_dict);
+                    function prepareConsDict(conns_dict, key, level) {
+                        var prepared_cons = [];
+                        prepared_cons.push([key, level]);
+                        if (!conns_dict.hasOwnProperty(key)) {
+                            return prepared_cons;
+                        }
+                        var cur_list = conns_dict[key];
+                        for (var i = 0; i < cur_list.length; i++) {
+                            var lower_list = prepareConsDict(conns_dict, cur_list[i], level + 1);
+                            prepared_cons.push(...lower_list);
+                        }
+                        return prepared_cons;
+                    }
+                    var prepared_cons = [];
+                    var first_dict = conns_dict["Edge"];
+                    for (var i = 0; i < first_dict.length; i++) {
+                        prepared_cons.push(...prepareConsDict(conns_dict, first_dict[i], 1));
+                    }
+                    // TODO: exclude author and such
+
+                    var edgePrompt = _.template(edgePromptTemplate)({edge_types: prepared_cons});
                     var edgePromptDOM = $(edgePrompt);
                     edgePromptDOM.find('#relation-dropdown').hierarchySelect({
                         width: 459
                     });
-                    edgePromptDOM.find("#select-button").click(function() {
+                    edgePromptDOM.find("#select-button").click(() => {
                         var selected_name = $(".selected-label").text();
-                        console.log(conns.find(x => x.name === selected_name));
+                        var conn_id = conns.find(x => x.name === selected_name).id;
+                        this.connectNodes(srcId, dstId, conn_id);
+                        // TODO: close modal
+                    });
+                    edgePromptDOM.find("#add-new-button").click(function() {
+                        alert("This is not supported yet!");
                     });
                     edgePromptDOM.modal("show");
                 } else {
@@ -149,6 +188,26 @@ define([
                     this.refreshExtras.bind(this)
                 ]);
             });
+    };
+
+    SemanticGraphWidget.prototype.updateTranslation = function () {
+        var zoom = this._zoomValue || 1,
+            shift = {};
+
+        if (!this.centerContent) {
+            return;
+        }
+
+        // Make sure it is shifted at least 20 px in each direction
+        shift.x = 0;  // This is a hack...
+        //shift.x = Math.max(TOP_LEFT_MIN_MARGIN, this._getTranslation('x'));
+        shift.y = Math.max(20, this._getTranslation('y'));
+
+        // Divide actual width by zoom value
+        this._logger.debug(`Updating translation: ${shift.x}, ${shift.y}`);
+        console.log(`Updating translation: ${shift.x}, ${shift.y}`);
+        this.$svg
+            .attr('transform', `translate(${shift.x},${shift.y}) scale(${zoom})`);
     };
 
     SemanticGraphWidget.prototype.refreshExtras = function () {

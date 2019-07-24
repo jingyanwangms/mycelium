@@ -1,6 +1,8 @@
 
 define([
+    './AddPaperDialog'
 ], function(
+    AddPaperDialog
 ) {
     const Actions = {};
 
@@ -10,6 +12,7 @@ define([
             icon: 'add',
             action: function() {
                 console.log('Bring up the dialog for creating new papers!');
+                AddPaperDialog.prompt();
             }
         }
     ];
