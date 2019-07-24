@@ -143,6 +143,26 @@ define([
             });
     };
 
+    SemanticGraphWidget.prototype.updateTranslation = function () {
+        var zoom = this._zoomValue || 1,
+            shift = {};
+
+        if (!this.centerContent) {
+            return;
+        }
+
+        // Make sure it is shifted at least 20 px in each direction
+        shift.x = 0;  // This is a hack...
+        //shift.x = Math.max(TOP_LEFT_MIN_MARGIN, this._getTranslation('x'));
+        shift.y = Math.max(20, this._getTranslation('y'));
+
+        // Divide actual width by zoom value
+        this._logger.debug(`Updating translation: ${shift.x}, ${shift.y}`);
+        console.log(`Updating translation: ${shift.x}, ${shift.y}`);
+        this.$svg
+            .attr('transform', `translate(${shift.x},${shift.y}) scale(${zoom})`);
+    };
+
     SemanticGraphWidget.prototype.refreshExtras = function () {
         this.updateEmptyMsg();
     };
