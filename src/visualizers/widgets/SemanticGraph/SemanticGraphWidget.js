@@ -300,14 +300,23 @@ define([
         const margin = 5;
         let y = 35;
         const dy = 18;
-        const types = Object.keys(this.connectionStyles);
-        const width = 180;
+        const types = _.uniq(Object.values(this.connections).map(c => c.desc.baseName))
+        const width = 220;
         const height = y + margin + dy*types.length;
         this.$legend.selectAll('*').remove();
+
+        if (types.length === 0) {
+            return;
+        }
+
         this.$legend.append('rect')
             .attr('class', 'legend')
             .attr('width', width)
-            .attr('height', height);
+            .attr('height', height)
+            .on('dblclick', () => {
+                this.getAllConcreteConnTypeNames()
+                    .forEach(type => this.toggleConnectionFilter(type));
+            });
 
         this.$legend.append('text')
             .attr('class', 'title')
