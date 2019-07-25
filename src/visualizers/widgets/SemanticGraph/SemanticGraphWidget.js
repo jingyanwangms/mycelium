@@ -356,13 +356,14 @@ define([
         const nodes = Object.values(this.items);
         const marginToNodes = 25;
         let x = 0;
+        y = Math.min(...nodes.map(node => node.y - node.height/2)) + 20;
         nodes.forEach(node => {
-            if (node.y - node.height < height) {
+            if (node.y - node.height < y + height) {
                 x = Math.max(x, node.x + node.width/2);
             }
         });
         x += marginToNodes;
-        this.$legend.attr('transform', `translate(${x}, 0) scale(1.5)`);
+        this.$legend.attr('transform', `translate(${x}, ${y}) scale(1.5)`);
         // TODO: Update legend position
         // set the x value to 0
     };
