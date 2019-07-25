@@ -8,6 +8,8 @@
     fill: white; }
     .semantic-graph .legend .title {
       font-size: 14px; }
+  .semantic-graph .hidden {
+    display: none; }
 
 .node-modal .modal-body {
   font-size: 14px; }

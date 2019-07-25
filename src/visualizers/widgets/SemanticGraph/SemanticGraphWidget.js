@@ -245,7 +245,6 @@ define([
 
         // Divide actual width by zoom value
         this._logger.debug(`Updating translation: ${shift.x}, ${shift.y}`);
-        console.log(`Updating translation: ${shift.x}, ${shift.y}`);
         this.$svg
             .attr('transform', `translate(${shift.x},${shift.y}) scale(${zoom})`);
     };
@@ -278,6 +277,14 @@ define([
                     this.connectionStyles[type] = remainingStyles.shift();
                 }
             });
+    };
+
+    SemanticGraphWidget.prototype.toggleConnectionFilter = function(type) {
+        if (this.filteredConnTypes[type]) {
+            delete this.filteredConnTypes[type];
+        } else {
+            this.filteredConnTypes[type] = true;
+        }
     };
 
     SemanticGraphWidget.prototype.refreshLegend = function () {
@@ -323,6 +330,8 @@ define([
             if (this.filteredConnTypes[type]) {
                 text.attr('text-decoration', 'line-through')
             }
+
+            text.on('click', () => this.toggleConnectionFilter(type))
         });
 
         // Position the legend outside the left most box within the given range
@@ -362,9 +371,16 @@ define([
 
             conn.points.unshift(graph.edges[i].sections[0].startPoint);
 
-            const style = this.connectionStyles[conn.desc.baseName];
+            const type = conn.desc.baseName;
+            const style = this.connectionStyles[type];
             conn.setStyle.apply(conn, style);
             conn.redraw();
+
+            if (this.filteredConnTypes[type]) {
+                conn.$path.attr('class', 'hidden');
+            } else {
+                conn.$path.attr('class', '');
+            }
         }
     };
 
