@@ -4,10 +4,14 @@
 .semantic-graph {
   outline: none; }
   .semantic-graph .legend {
-    stroke: #eeeeee;
-    fill: white; }
-    .semantic-graph .legend .title {
-      font-size: 14px; }
+    right: 25px;
+    top: 15px;
+    position: absolute; }
+    .semantic-graph .legend rect {
+      stroke: #eeeeee;
+      fill: white; }
+      .semantic-graph .legend rect .title {
+        font-size: 14px; }
   .semantic-graph .hidden {
     display: none; }
 

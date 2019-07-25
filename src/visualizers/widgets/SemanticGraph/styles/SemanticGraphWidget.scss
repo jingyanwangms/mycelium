@@ -5,10 +5,15 @@
 .semantic-graph {
   outline: none;
   .legend {
-      stroke: #eeeeee;
-      fill: white;
-      .title {
-          font-size: 14px;
+      right: 25px;
+      top: 15px;
+      position: absolute;
+      rect {
+          stroke: #eeeeee;
+          fill: white;
+          .title {
+              font-size: 14px;
+          }
       }
   }
   .hidden {

@@ -44,7 +44,9 @@ define([
     function SemanticGraphWidget(logger, container) {
         EasyDAGWidget.apply(this, arguments);
         this.connectionStyles = {};
-        this.$legend = this._$svg.append('g');
+        this.$legend = d3.select(this.$el[0])
+            .append('svg')
+            .attr('class', 'legend');
         this.$el.addClass(WIDGET_CLASS);
         this.filteredConnTypes = {};
     }
@@ -297,11 +299,11 @@ define([
     };
 
     SemanticGraphWidget.prototype.refreshLegend = function () {
-        const margin = 5;
-        let y = 35;
-        const dy = 18;
+        const margin = 15;
+        let y = 55;
+        const dy = 27;
         const types = _.uniq(Object.values(this.connections).map(c => c.desc.baseName))
-        const width = 220;
+        const width = 330;
         const height = y + margin + dy*types.length;
         this.$legend.selectAll('*').remove();
 
@@ -310,7 +312,6 @@ define([
         }
 
         this.$legend.append('rect')
-            .attr('class', 'legend')
             .attr('width', width)
             .attr('height', height)
             .on('dblclick', () => {
@@ -320,7 +321,7 @@ define([
 
         this.$legend.append('text')
             .attr('class', 'title')
-            .attr('font-size', '14px')
+            .attr('font-size', '22px')
             .attr('x', width/2)
             .attr('y', y/2)
             .attr('text-anchor', 'middle')
@@ -335,14 +336,16 @@ define([
             y += dy;
 
             row.append('path')
-                .attr('d', 'm 10 0 l 30 0')
+                .attr('d', 'm 10 0 l 45 0')
                 .attr('stroke', color)
+                .attr('stroke-width', 5)
                 .attr('stroke-dasharray', dasharray);
 
             const text = row.append('text')
-                .attr('x', 55)
+                .attr('x', 80)
                 .text(type)
                 .attr('fill', '#000000')
+                .attr('font-size', '18px')
                 .attr('alignment-baseline','middle');
 
             if (this.filteredConnTypes[type]) {
@@ -351,21 +354,6 @@ define([
 
             text.on('click', () => this.toggleConnectionFilter(type))
         });
-
-        // Position the legend outside the left most box within the given range
-        const nodes = Object.values(this.items);
-        const marginToNodes = 25;
-        let x = 0;
-        y = Math.min(...nodes.map(node => node.y - node.height/2)) + 20;
-        nodes.forEach(node => {
-            if (node.y - node.height < y + height) {
-                x = Math.max(x, node.x + node.width/2);
-            }
-        });
-        x += marginToNodes;
-        this.$legend.attr('transform', `translate(${x}, ${y}) scale(1.5)`);
-        // TODO: Update legend position
-        // set the x value to 0
     };
 
     SemanticGraphWidget.prototype.refreshExtras = function () {
