@@ -4,6 +4,13 @@
 
 .semantic-graph {
   outline: none;
+  .legend {
+      stroke: #eeeeee;
+      fill: white;
+      .title {
+          font-size: 14px;
+      }
+  }
 }  
 .node-modal {
   .modal-body {

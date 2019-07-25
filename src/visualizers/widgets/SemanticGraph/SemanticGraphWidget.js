@@ -44,6 +44,9 @@ define([
     function SemanticGraphWidget(logger, container) {
         EasyDAGWidget.apply(this, arguments);
         this.connectionStyles = {};
+        this.$legend = this._$svg.append('g');
+        this.$el.addClass(WIDGET_CLASS);
+        this.filteredConnTypes = {};
     }
 
     SemanticGraphWidget.prototype = Object.create(EasyDAGWidget.prototype);
@@ -247,9 +250,16 @@ define([
             .attr('transform', `translate(${shift.x},${shift.y}) scale(${zoom})`);
     };
 
+    SemanticGraphWidget.prototype.getAllConcreteConnTypeNames = function () {
+        // TODO: use the isAbstract field from the node
+        return this.getAllConnectionTypes()
+            .map(data => data.name)
+            .filter(type => type !== 'Edge');
+    };
+
     SemanticGraphWidget.prototype.setConnectionStyles = function () {
         // Remove styles for unused types (if we switch projects or something)
-        const currentTypes = this.getAllConnectionTypes();
+        const currentTypes = this.getAllConcreteConnTypeNames();
         const prevTypes = Object.keys(this.connectionStyles);
         const oldTypes = _.difference(prevTypes, currentTypes);
         oldTypes.forEach(type => delete this.connectionStyles[type]);
@@ -257,7 +267,7 @@ define([
         const usedStyles = Object.values(this.connectionStyles);
         const remainingStyles = _.difference(ConnectionStyles, usedStyles);
 
-        currentTypes.map(data => data.name)
+        currentTypes
             .forEach(type => {
                 if (!this.connectionStyles[type]) {
                     if (remainingStyles.length === 0) {
@@ -270,9 +280,69 @@ define([
             });
     };
 
+    SemanticGraphWidget.prototype.refreshLegend = function () {
+        const margin = 5;
+        let y = 35;
+        const dy = 18;
+        const types = Object.keys(this.connectionStyles);
+        const width = 180;
+        const height = y + margin + dy*types.length;
+        this.$legend.selectAll('*').remove();
+        this.$legend.append('rect')
+            .attr('class', 'legend')
+            .attr('width', width)
+            .attr('height', height);
+
+        this.$legend.append('text')
+            .attr('class', 'title')
+            .attr('font-size', '14px')
+            .attr('x', width/2)
+            .attr('y', y/2)
+            .attr('text-anchor', 'middle')
+            .text('Legend');
+
+        // Add the lines
+        types.forEach(type => {
+            const row = this.$legend.append('g');
+            const [color, dasharray] = this.connectionStyles[type];
+
+            row.attr('transform', `translate(0, ${y})`);
+            y += dy;
+
+            row.append('path')
+                .attr('d', 'm 10 0 l 30 0')
+                .attr('stroke', color)
+                .attr('stroke-dasharray', dasharray);
+
+            const text = row.append('text')
+                .attr('x', 55)
+                .text(type)
+                .attr('fill', '#000000')
+                .attr('alignment-baseline','middle');
+
+            if (this.filteredConnTypes[type]) {
+                text.attr('text-decoration', 'line-through')
+            }
+        });
+
+        // Position the legend outside the left most box within the given range
+        const nodes = Object.values(this.items);
+        const marginToNodes = 25;
+        let x = 0;
+        nodes.forEach(node => {
+            if (node.y - node.height < height) {
+                x = Math.max(x, node.x + node.width/2);
+            }
+        });
+        x += marginToNodes;
+        this.$legend.attr('transform', `translate(${x}, 0) scale(1.5)`);
+        // TODO: Update legend position
+        // set the x value to 0
+    };
+
     SemanticGraphWidget.prototype.refreshExtras = function () {
         this.updateEmptyMsg();
-        // TODO: Refresh the legend
+        this.refreshLegend();
     };
 
     SemanticGraphWidget.prototype.refreshConnections = function (graph) {

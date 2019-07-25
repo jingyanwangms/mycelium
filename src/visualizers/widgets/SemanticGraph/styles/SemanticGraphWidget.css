@@ -3,6 +3,11 @@
  */
 .semantic-graph {
   outline: none; }
+  .semantic-graph .legend {
+    stroke: #eeeeee;
+    fill: white; }
+    .semantic-graph .legend .title {
+      font-size: 14px; }
 
 .node-modal .modal-body {
   font-size: 14px; }
