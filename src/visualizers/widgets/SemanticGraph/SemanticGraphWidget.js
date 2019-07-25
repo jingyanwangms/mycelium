@@ -204,6 +204,15 @@ define([
         const nodes = Object.values(this.items)
             .map(item => _.pick(item, ['id', 'width', 'height']));
         const edges = Object.values(this.connections)
+            .filter(conn => {
+                const type = conn.desc.baseName;
+                if (this.filteredConnTypes[type]) {
+                    conn.$path.attr('class', 'hidden');
+                } else {
+                    conn.$path.attr('class', '');
+                }
+                return !this.filteredConnTypes[type];
+            })
             .map(conn => ({id: conn.id, sources: [conn.src], targets: [conn.dst]}));
 
         const graph = {
@@ -366,21 +375,16 @@ define([
             }
 
             const conn = this.connections[id];
+            const type = conn.desc.baseName;
+
             conn.points = graph.edges[i].sections
                 .map(sec => sec.endPoint);
 
             conn.points.unshift(graph.edges[i].sections[0].startPoint);
 
-            const type = conn.desc.baseName;
             const style = this.connectionStyles[type];
             conn.setStyle.apply(conn, style);
             conn.redraw();
-
-            if (this.filteredConnTypes[type]) {
-                conn.$path.attr('class', 'hidden');
-            } else {
-                conn.$path.attr('class', '');
-            }
         }
     };
 
